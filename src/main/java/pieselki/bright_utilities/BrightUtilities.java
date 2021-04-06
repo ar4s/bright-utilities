@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 @Mod(BrightUtilities.MODID)
 public class BrightUtilities {
-    private static final Logger LOGGER = LogManager.getLogger();
+    public static final Logger LOGGER = LogManager.getLogger();
     public static final String MODID = "bright_utilities";
 
     public BrightUtilities() {
