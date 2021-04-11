@@ -1,0 +1,7 @@
+{
+  "chat_mention": {
+    "category": "player",
+    "subtitle": "bright_utilities.subtitle.chat_mention",
+    "sounds": ["bright_utilities:chat_mention"]
+  }
+}
