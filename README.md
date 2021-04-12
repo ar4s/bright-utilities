@@ -5,5 +5,5 @@
 ## Key features
 
 - Wrench able to rotate blocks in any direction
+- Playing sound if someone mentions you, text coloring for mentions of online players
 - (TODO) Power proxy for measuring power generation and consumption
-- (TODO) Chat utilities such as sounds and mentions (with a dedication to Karolina)
