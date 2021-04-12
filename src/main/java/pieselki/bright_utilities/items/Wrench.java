@@ -3,12 +3,18 @@ package pieselki.bright_utilities.items;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.DirectionalBlock;
+import net.minecraft.block.FurnaceBlock;
+import net.minecraft.block.HorizontalBlock;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.state.DirectionProperty;
+import net.minecraft.state.Property;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -32,37 +38,47 @@ public class Wrench extends Item {
     private Direction getNextFacingValue(Direction clickedFace, Direction currentFacingValue, Direction playerFacingDirection,
             Collection<Direction> possibleDirections, Boolean alternativeRotation) {
         List<Direction> rotationOrder = getRotationOrder(clickedFace, alternativeRotation, playerFacingDirection);
- 
-        int nextRotationIndex = rotationOrder.contains(currentFacingValue) ? (rotationOrder.indexOf(currentFacingValue) + 1) % rotationOrder.size() : 0;
-        while (!possibleDirections.contains(rotationOrder.get(nextRotationIndex))) {
-            nextRotationIndex = (nextRotationIndex + 1) % rotationOrder.size();
+        List<Direction> filteredRotationOrder = rotationOrder.stream().distinct().filter(possibleDirections::contains).collect(Collectors.toList());
+
+        if(filteredRotationOrder.size() == 0) {
+            return currentFacingValue;
         }
 
-        return rotationOrder.get(nextRotationIndex);
+        int nextRotationIndex = filteredRotationOrder.contains(currentFacingValue) ? (filteredRotationOrder.indexOf(currentFacingValue) + 1) % filteredRotationOrder.size() : 0;
+        return filteredRotationOrder.get(nextRotationIndex);
+    }
+
+    private BlockState rotateBlock(BlockState blockState, Direction clickedFace, Direction playerFacingDirection, boolean isSneaking, DirectionProperty property) {
+        Direction facingDirection = blockState.getValue(property);
+        Collection<Direction> possibleDirections = property.getPossibleValues();
+        return blockState.setValue(property,
+                getNextFacingValue(clickedFace, facingDirection, playerFacingDirection, possibleDirections, isSneaking));
+
     }
 
     @Override
-    public ActionResultType useOn(ItemUseContext ctx) {
+    public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext ctx) {
         final World world = ctx.getLevel();
         final BlockPos pos = ctx.getClickedPos();
         final BlockState blockState = world.getBlockState(pos);
         final Boolean isSneaking = ctx.isSecondaryUseActive();
         final Direction playerFacingDirection = ctx.getPlayer().getDirection();
+        Direction clickedFace = ctx.getClickedFace();
         BlockState newBlockState = null;
-        for (Object obj : blockState.getProperties()) {
-            if (obj instanceof DirectionProperty && blockState.getBlock() instanceof DirectionalBlock) {
-                DirectionProperty directionProperty = (DirectionProperty) obj;
-                Direction facingDirection = blockState.getValue(directionProperty);
-                Direction clickedFace = ctx.getClickedFace();
-                Collection<Direction> possibleDirections = directionProperty.getPossibleValues();
-                newBlockState = blockState.setValue(DirectionalBlock.FACING,
-                        getNextFacingValue(clickedFace, facingDirection, playerFacingDirection, possibleDirections, isSneaking));
+
+        for (Property<?> property : blockState.getProperties()) {
+            if(property == BlockStateProperties.HORIZONTAL_FACING) {
+                newBlockState = rotateBlock(blockState, clickedFace, playerFacingDirection, isSneaking, BlockStateProperties.HORIZONTAL_FACING);
+            }
+            if(property == BlockStateProperties.FACING) {
+                newBlockState = rotateBlock(blockState, clickedFace, playerFacingDirection, isSneaking, BlockStateProperties.FACING);
             }
         }
 
         if (newBlockState != null) {
             world.setBlockAndUpdate(pos, newBlockState);
+            return ActionResultType.SUCCESS;
         }
-        return ActionResultType.PASS;
+        return super.onItemUseFirst(stack, ctx);
     }
 }
