@@ -27,8 +27,8 @@ public class ChatEvents {
       event.setMessage(new StringTextComponent(message.replaceAll("(@[".concat(mentionOptions).concat("]+)"), "\2475$1\247f")));
     }
 
-    // play sound if someone mentioned you
-    if(!message.startsWith("<".concat(currentPlayerName).concat(">")) && messageContent.contains("@".concat(currentPlayerName))) {
+    // play sound if someone mentioned you or you are Bielowa
+    if(currentPlayerName == "Bielowa" || (!message.startsWith("<".concat(currentPlayerName).concat(">")) && messageContent.contains("@".concat(currentPlayerName)))) {
       currentPlayer.playSound(Registration.CHAT_MENTION.get(), 1.0F, 1.0F);
     }
 	}

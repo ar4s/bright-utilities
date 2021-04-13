@@ -1,7 +1,6 @@
 package pieselki.bright_utilities.setup;
 
 import pieselki.bright_utilities.blocks.PowerProxy;
-import pieselki.bright_utilities.events.ChatEvents;
 import pieselki.bright_utilities.items.Wrench;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
@@ -11,7 +10,6 @@ import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
@@ -34,8 +32,6 @@ public class Registration {
         CONTAINERS.register(FMLJavaModLoadingContext.get().getModEventBus());
         ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
         SOUND_EVENTS.register(FMLJavaModLoadingContext.get().getModEventBus());
-
-        MinecraftForge.EVENT_BUS.register(new ChatEvents());
     }
 
     public static final RegistryObject<PowerProxy> POWER_PROXY = BLOCKS.register("power_proxy", PowerProxy::new);
