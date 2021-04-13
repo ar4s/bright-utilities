@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.network.play.NetworkPlayerInfo;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -15,7 +15,7 @@ public class ChatEvents {
   @SubscribeEvent
 	public void onPrintChatMessage(ClientChatReceivedEvent event) {
     Minecraft instance = Minecraft.getInstance();
-    List<String> onlinePlayers = instance.level.players().stream().map((AbstractClientPlayerEntity player) -> player.getName().getString()).collect(Collectors.toList());
+    List<String> onlinePlayers = instance.getConnection().getOnlinePlayers().stream().map((NetworkPlayerInfo player) -> player.getProfile().getName().toString()).collect(Collectors.toList());
     ClientPlayerEntity currentPlayer = instance.player;
     String message = event.getMessage().getString();
     String messageContent = message.replaceFirst("<([^>]+)> ", "");
