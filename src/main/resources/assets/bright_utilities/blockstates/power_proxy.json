@@ -1,0 +1,27 @@
+{
+    "variants": {
+        "facing=down": {
+            "model": "bright_utilities:block/power_proxy",
+            "x": 90
+        },
+        "facing=up": {
+            "model": "bright_utilities:block/power_proxy",
+            "x": -90
+        },
+        "facing=north": {
+            "model": "bright_utilities:block/power_proxy"
+        },
+        "facing=south": {
+            "model": "bright_utilities:block/power_proxy",
+            "y": 180
+        },
+        "facing=east": {
+            "model": "bright_utilities:block/power_proxy",
+            "y": 90
+        },
+        "facing=west": {
+            "model": "bright_utilities:block/power_proxy",
+            "y": 270
+        }
+    }
+}
