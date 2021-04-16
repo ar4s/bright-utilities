@@ -6,6 +6,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import pieselki.bright_utilities.utils.NumericUtils;
 
 public class PowerProxyTileRenderer extends TileEntityRenderer<PowerProxyTile> {
 
@@ -21,7 +22,7 @@ public class PowerProxyTileRenderer extends TileEntityRenderer<PowerProxyTile> {
   public void render(PowerProxyTile tile, float partialTick, MatrixStack matrix, IRenderTypeBuffer buffer, int light,
       int overlayLight) {
     FontRenderer fontRenderer = renderer.font;
-    String text = String.format("%s RF/T", tile.getTileData());
+    String text = String.format("%s RF/T", NumericUtils.getShortNotation(tile.getLastTransferAmount()));
     int textWidth = fontRenderer.width(text);
 
     matrix.pushPose();

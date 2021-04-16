@@ -3,6 +3,7 @@ package pieselki.bright_utilities.setup;
 import pieselki.bright_utilities.blocks.PowerProxy;
 import pieselki.bright_utilities.blocks.PowerProxyTile;
 import pieselki.bright_utilities.items.Wrench;
+import pieselki.bright_utilities.network.Networking;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
 import net.minecraft.inventory.container.ContainerType;
@@ -37,6 +38,7 @@ public class Registration {
                 CONTAINERS.register(FMLJavaModLoadingContext.get().getModEventBus());
                 ENTITIES.register(FMLJavaModLoadingContext.get().getModEventBus());
                 SOUND_EVENTS.register(FMLJavaModLoadingContext.get().getModEventBus());
+                Networking.registerMessages();
         }
 
         public static final RegistryObject<PowerProxy> POWER_PROXY = BLOCKS.register("power_proxy", PowerProxy::new);

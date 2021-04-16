@@ -5,10 +5,14 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+import pieselki.bright_utilities.network.Networking;
+import pieselki.bright_utilities.network.packets.UpdatePowerProxyDisplay;
+import net.minecraftforge.fml.network.PacketDistributor.TargetPoint;
 import pieselki.bright_utilities.utils.CustomEnergyStorage;
 import static pieselki.bright_utilities.setup.Registration.POWER_PROXY_TILE;
 
@@ -23,9 +27,18 @@ public class PowerProxyTile extends TileEntity implements ITickableTileEntity {
     private CustomEnergyStorage energyStorage = createEnergy();
     private LazyOptional<IEnergyStorage> energy = LazyOptional.of(() -> energyStorage);
     private int maxTransfer = Integer.MAX_VALUE;
+    private int lastTransferAmount = 0;
 
     public PowerProxyTile() {
         super(POWER_PROXY_TILE.get());
+    }
+
+    public int getLastTransferAmount() {
+        return lastTransferAmount;
+    }
+
+    public void setLastTransferAmount(int lastTransferAmount) {
+        this.lastTransferAmount = lastTransferAmount;
     }
 
     @Override
@@ -66,7 +79,10 @@ public class PowerProxyTile extends TileEntity implements ITickableTileEntity {
 
         int totalInput = inputs.values().stream().mapToInt(Integer::intValue).sum();
         int totalOutput = outputs.values().stream().mapToInt(Integer::intValue).sum();
-        energyStorage.setEnergy(Math.min(totalInput, totalOutput));
+        int energyPassed = Math.min(totalInput, totalOutput);
+        energyStorage.setEnergy(energyPassed);
+        Chunk chunk = level.getChunkAt(worldPosition);
+        Networking.sendToChunk(new UpdatePowerProxyDisplay(worldPosition, energyPassed), () -> chunk);
 
         inputs.entrySet().forEach((entry) -> {
             IEnergyStorage handler = entry.getKey();
