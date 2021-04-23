@@ -1,8 +1,10 @@
 package pieselki.bright_utilities.setup;
 
 import pieselki.bright_utilities.BrightUtilities;
+import pieselki.bright_utilities.blocks.PowerProxyScreen;
 import pieselki.bright_utilities.blocks.PowerProxyTileRenderer;
 import pieselki.bright_utilities.events.ChatEvents;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -14,5 +16,6 @@ public class ClientSetup {
     public static void init(final FMLClientSetupEvent event) {
         MinecraftForge.EVENT_BUS.register(new ChatEvents());
         ClientRegistry.bindTileEntityRenderer(Registration.POWER_PROXY_TILE.get(), PowerProxyTileRenderer::new);
+        ScreenManager.register(Registration.POWER_PROXY_CONTAINER.get(), PowerProxyScreen::new);
     }
 }

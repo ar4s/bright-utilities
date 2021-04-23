@@ -3,7 +3,7 @@ package pieselki.bright_utilities.utils;
 import java.text.DecimalFormat;
 
 public class NumericUtils {
-  private static String[] ABBREVATIONS = { "", "K", "M", "B", "t", "q", "Q", "s", "S" };
+  private static String[] ABBREVATIONS = { "", "k", "M", "G", "T", "P", "E", "Z", "Y" };
 
   public static String getShortNotation(float num) {
     int abbrevationIndex = 0;
