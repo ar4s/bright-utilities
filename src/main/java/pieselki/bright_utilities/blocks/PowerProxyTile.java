@@ -12,8 +12,8 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import pieselki.bright_utilities.network.Networking;
 import pieselki.bright_utilities.network.packets.UpdatePowerProxyDisplay;
-import net.minecraftforge.fml.network.PacketDistributor.TargetPoint;
 import pieselki.bright_utilities.utils.CustomEnergyStorage;
+
 import static pieselki.bright_utilities.setup.Registration.POWER_PROXY_TILE;
 
 import java.util.Collections;
@@ -27,10 +27,44 @@ public class PowerProxyTile extends TileEntity implements ITickableTileEntity {
     private CustomEnergyStorage energyStorage = createEnergy();
     private LazyOptional<IEnergyStorage> energy = LazyOptional.of(() -> energyStorage);
     private int maxTransfer = Integer.MAX_VALUE;
+    private HashMap<Direction, SideConfiguration> sidesConfig = new HashMap<Direction, SideConfiguration>();
     private int lastTransferAmount = 0;
+    private Direction facingDirection = null;
+
+    enum SideConfiguration {
+        NONE(0), INPUT(1), OUTPUT(2);
+
+        private int value;
+
+        private SideConfiguration(int value) {
+            this.value = value;
+        }
+
+        public SideConfiguration getNext() {
+            return values()[(value + 1) % values().length];
+        }
+
+        public static SideConfiguration fromValue(int v) {
+            return values()[v];
+        }
+    }
 
     public PowerProxyTile() {
         super(POWER_PROXY_TILE.get());
+    }
+
+    public void initialize(Direction facingDirection) {
+        this.facingDirection = facingDirection;
+        sidesConfig.put(facingDirection.getClockWise(), SideConfiguration.INPUT);
+        sidesConfig.put(facingDirection.getCounterClockWise(), SideConfiguration.OUTPUT);
+    }
+
+    public void cicleSideConfiguration(Direction side) {
+        sidesConfig.put(side, sidesConfig.get(side).getNext());
+    }
+
+    public SideConfiguration getSideConfiguration(Direction side) {
+        return sidesConfig.get(side);
     }
 
     public int getLastTransferAmount() {
@@ -50,29 +84,29 @@ public class PowerProxyTile extends TileEntity implements ITickableTileEntity {
         HashMap<IEnergyStorage, Integer> inputs = new HashMap<IEnergyStorage, Integer>();
         HashMap<IEnergyStorage, Integer> outputs = new HashMap<IEnergyStorage, Integer>();
 
-        // TODO: change to input directions
         for (Direction dir : Direction.values()) {
-            TileEntity tileEntity = level.getBlockEntity(worldPosition.relative(dir));
-            if (tileEntity != null) {
-                LazyOptional<IEnergyStorage> capability = tileEntity.getCapability(CapabilityEnergy.ENERGY,
-                        dir.getOpposite());
-                int inputAmount = capability.map(handler -> handler.extractEnergy(Integer.MAX_VALUE, true)).orElse(0);
+            if (sidesConfig.get(dir) == SideConfiguration.INPUT) {
+                TileEntity tileEntity = level.getBlockEntity(worldPosition.relative(dir));
+                if (tileEntity != null) {
+                    LazyOptional<IEnergyStorage> capability = tileEntity.getCapability(CapabilityEnergy.ENERGY,
+                            dir.getOpposite());
+                    int inputAmount = capability.map(handler -> handler.extractEnergy(Integer.MAX_VALUE, true))
+                            .orElse(0);
 
-                if (inputAmount > 0) {
-                    inputs.put(capability.resolve().get(), inputAmount);
+                    if (inputAmount > 0) {
+                        inputs.put(capability.resolve().get(), inputAmount);
+                    }
                 }
-            }
-        }
-
-        // TODO: Change to output directions
-        for (Direction dir : Direction.values()) {
-            TileEntity tileEntity = level.getBlockEntity(worldPosition.relative(dir));
-            if (tileEntity != null) {
-                LazyOptional<IEnergyStorage> capability = tileEntity.getCapability(CapabilityEnergy.ENERGY,
-                        dir.getOpposite());
-                int outputAmount = capability.map(handler -> handler.receiveEnergy(Integer.MAX_VALUE, true)).orElse(0);
-                if (outputAmount > 0) {
-                    outputs.put(capability.resolve().get(), outputAmount);
+            } else if (sidesConfig.get(dir) == SideConfiguration.OUTPUT) {
+                TileEntity tileEntity = level.getBlockEntity(worldPosition.relative(dir));
+                if (tileEntity != null) {
+                    LazyOptional<IEnergyStorage> capability = tileEntity.getCapability(CapabilityEnergy.ENERGY,
+                            dir.getOpposite());
+                    int outputAmount = capability.map(handler -> handler.receiveEnergy(Integer.MAX_VALUE, true))
+                            .orElse(0);
+                    if (outputAmount > 0) {
+                        outputs.put(capability.resolve().get(), outputAmount);
+                    }
                 }
             }
         }
@@ -100,20 +134,25 @@ public class PowerProxyTile extends TileEntity implements ITickableTileEntity {
     @Override
     public void load(BlockState state, CompoundNBT tag) {
         energyStorage.deserializeNBT(tag.getCompound("energy"));
+        for (Direction key : sidesConfig.keySet()) {
+            sidesConfig.put(key, SideConfiguration.fromValue(tag.getInt(key.toString())));
+        }
         super.load(state, tag);
     }
 
     @Override
     public CompoundNBT save(CompoundNBT tag) {
         tag.put("energy", energyStorage.serializeNBT());
+        for (Direction key : sidesConfig.keySet()) {
+            tag.putInt(key.toString(), sidesConfig.get(key).ordinal());
+        }
         return super.save(tag);
     }
 
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        // TODO: return energy capability only for sides that have input/output enabled
-        if (cap == CapabilityEnergy.ENERGY) {
+        if (cap == CapabilityEnergy.ENERGY && sidesConfig.get(side) != SideConfiguration.NONE) {
             return energy.cast();
         }
         return super.getCapability(cap, side);

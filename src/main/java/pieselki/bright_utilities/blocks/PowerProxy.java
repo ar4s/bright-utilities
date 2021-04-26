@@ -49,7 +49,9 @@ public class PowerProxy extends Block {
 
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new PowerProxyTile();
+        PowerProxyTile tile = new PowerProxyTile();
+        tile.initialize(state.getValue(FACING));
+        return tile;
     }
 
     @Override
