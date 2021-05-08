@@ -6,6 +6,7 @@ import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.gen.feature.jigsaw.JigsawOrientation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -29,7 +30,6 @@ public class PowerProxyTile extends TileEntity implements ITickableTileEntity {
     private int maxTransfer = Integer.MAX_VALUE;
     private HashMap<Direction, SideConfiguration> sidesConfig = new HashMap<Direction, SideConfiguration>();
     private int lastTransferAmount = 0;
-    private Direction facingDirection = null;
 
     enum SideConfiguration {
         NONE(0), INPUT(1), OUTPUT(2);
@@ -53,10 +53,14 @@ public class PowerProxyTile extends TileEntity implements ITickableTileEntity {
         super(POWER_PROXY_TILE.get());
     }
 
-    public void initialize(Direction facingDirection) {
-        this.facingDirection = facingDirection;
-        sidesConfig.put(facingDirection.getClockWise(), SideConfiguration.INPUT);
-        sidesConfig.put(facingDirection.getCounterClockWise(), SideConfiguration.OUTPUT);
+    public void initialize(BlockState state) {
+        JigsawOrientation orientation = state.getValue(PowerProxy.ORIENTATION);
+        Direction frontFace = orientation.front();
+        if (frontFace == Direction.UP || frontFace == Direction.DOWN) {
+            frontFace = orientation.top();
+        }
+        sidesConfig.put(frontFace.getClockWise(), SideConfiguration.INPUT);
+        sidesConfig.put(frontFace.getCounterClockWise(), SideConfiguration.OUTPUT);
     }
 
     public void cicleSideConfiguration(Direction side) {

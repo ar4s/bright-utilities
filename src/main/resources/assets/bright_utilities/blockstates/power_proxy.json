@@ -1,27 +1,51 @@
 {
-    "variants": {
-        "facing=down": {
-            "model": "bright_utilities:block/power_proxy",
-            "x": 90
-        },
-        "facing=up": {
-            "model": "bright_utilities:block/power_proxy",
-            "x": -90
-        },
-        "facing=north": {
-            "model": "bright_utilities:block/power_proxy"
-        },
-        "facing=south": {
-            "model": "bright_utilities:block/power_proxy",
-            "y": 180
-        },
-        "facing=east": {
-            "model": "bright_utilities:block/power_proxy",
-            "y": 90
-        },
-        "facing=west": {
-            "model": "bright_utilities:block/power_proxy",
-            "y": 270
-        }
+  "variants": {
+    "orientation=down_east": {
+      "model": "bright_utilities:block/power_proxy",
+      "x": 90
+    },
+    "orientation=down_north": {
+      "model": "bright_utilities:block/power_proxy",
+      "x": 90
+    },
+    "orientation=down_south": {
+      "model": "bright_utilities:block/power_proxy",
+      "x": 90
+    },
+    "orientation=down_west": {
+      "model": "bright_utilities:block/power_proxy",
+      "x": 90
+    },
+    "orientation=up_east": {
+      "model": "bright_utilities:block/power_proxy",
+      "x": -90
+    },
+    "orientation=up_north": {
+      "model": "bright_utilities:block/power_proxy",
+      "x": -90
+    },
+    "orientation=up_south": {
+      "model": "bright_utilities:block/power_proxy",
+      "x": -90
+    },
+    "orientation=up_west": {
+      "model": "bright_utilities:block/power_proxy",
+      "x": -90
+    },
+    "orientation=north_up": {
+      "model": "bright_utilities:block/power_proxy"
+    },
+    "orientation=south_up": {
+      "model": "bright_utilities:block/power_proxy",
+      "y": 180
+    },
+    "orientation=east_up": {
+      "model": "bright_utilities:block/power_proxy",
+      "y": 90
+    },
+    "orientation=west_up": {
+      "model": "bright_utilities:block/power_proxy",
+      "y": 270
     }
+  }
 }

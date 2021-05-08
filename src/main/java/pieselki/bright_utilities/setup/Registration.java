@@ -1,7 +1,6 @@
 package pieselki.bright_utilities.setup;
 
 import pieselki.bright_utilities.blocks.PowerProxy;
-import pieselki.bright_utilities.blocks.PowerProxyContainer;
 import pieselki.bright_utilities.blocks.PowerProxyTile;
 import pieselki.bright_utilities.items.Wrench;
 import pieselki.bright_utilities.network.Networking;
@@ -13,9 +12,6 @@ import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
@@ -49,12 +45,6 @@ public class Registration {
         public static final RegistryObject<TileEntityType<PowerProxyTile>> POWER_PROXY_TILE = TILES.register(
                         "power_proxy",
                         () -> TileEntityType.Builder.of(PowerProxyTile::new, POWER_PROXY.get()).build(null));
-        public static final RegistryObject<ContainerType<PowerProxyContainer>> POWER_PROXY_CONTAINER = CONTAINERS
-                        .register("power_proxy", () -> IForgeContainerType.create((windowId, inv, data) -> {
-                                BlockPos pos = data.readBlockPos();
-                                World world = inv.player.getCommandSenderWorld();
-                                return new PowerProxyContainer(windowId, world, pos, inv, inv.player);
-                        }));
         public static final RegistryObject<Item> POWER_PROXY_ITEM = ITEMS.register("power_proxy",
                         () -> new BlockItem(POWER_PROXY.get(), new Item.Properties().tab(ModSetup.ITEM_GROUP)));
 
