@@ -1,4 +1,4 @@
-# Bright Uitilies
+# Bright Utilities
 
 #### Minecraft 1.16.5 mod made by Piesełki Frontendu
 
